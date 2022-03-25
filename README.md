@@ -1,3 +1,4 @@
+[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-f059dc9a6f8d3a56e377f745f24479a46679e63a5d9fe6f495e02850cd0d8118.svg)](https://classroom.github.com/online_ide?assignment_repo_id=7425955&assignment_repo_type=AssignmentRepo)
 # React Native 𝞪 (10 points total + 2 points extra credit)
 
 This assignment is meant to introduce you to React Native, Expo, and the basics of using RESTful APIs. Specifically, you will be building essential screens for a fitness tracking application. We recommend starting this assignment as soon as possible, and not waiting until the deadline! See the videos in the assignment description for helpful information on setting up your project as well as what an example walkthrough may look like.
