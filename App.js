@@ -10,6 +10,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import {View} from "react-native";
 
 // Review the navigators from React Native 2 lecture.
 const Stack = createStackNavigator(); // Stack Navigator (https://reactnavigation.org/docs/stack-navigator)
@@ -31,6 +32,20 @@ class App extends React.Component {
     this.setState({ accessToken: newAccessToken });
   };
 
+  /*
+            <Stack.Screen name="Profile">
+            {(props) => <ProfileView {...props} />}
+          </Stack.Screen>
+          */
+  Home() {
+    return (
+      <Tab.Navigator name="Home">
+        <Tab.Screen name="Profile" component={ProfileView}></Tab.Screen>
+        <Tab.Screen name="Excercise" component={ExercisesView}></Tab.Screen>
+      </Tab.Navigator>
+    )
+  }
+
   render() {
     return (
       <NavigationContainer>
@@ -49,15 +64,20 @@ class App extends React.Component {
 
           {/* If you do not need to pass props, you can pass a component as a `component` prop to Screens like below */}
           <Stack.Screen name="SignUp" component={SignupView} />
-
+              
           {/* We can also nest another navigator (e.g. Bottom Tabs, Drawer, etc.) inside a stack navigator.
               See https://reactnavigation.org/docs/nesting-navigators on how to nest navigators.
             */}
-          <Stack.Screen name="Profile">
-            {(props) => <ProfileView {...props} />}
+            {(props) => (
+              <SignupView {...props} setAccessToken={this.setAccessToken} />
+            )}
+
+          <Stack.Screen name="Profile" component={this.Home}>
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
+
+
     );
   }
 }
