@@ -24,24 +24,46 @@ class App extends React.Component {
     // Feel free to add more states here
     this.state = {
       accessToken: undefined,
+      username: undefined
     };
   }
 
   // Set the access token
+  
   setAccessToken = (newAccessToken) => {
     this.setState({ accessToken: newAccessToken });
+    console.log(this.state.accessToken)
   };
+/*
+  setAccessToken() {
+    this.setState({ accessToken: newAccessToken });
+    console.log(this.state.accessToken)
+    console.log('HERE!!!!')
+  }*/
+
+  setUsername = (newUsername) => {
+    this.setState({ username: newUsername })
+    console.log(this.state.username)
+  }
 
   /*
             <Stack.Screen name="Profile">
             {(props) => <ProfileView {...props} />}
           </Stack.Screen>
           */
-  Home() {
+  Home = () => {
     return (
-      <Tab.Navigator name="Home">
-        <Tab.Screen name="Profile" component={ProfileView}></Tab.Screen>
-        <Tab.Screen name="Excercise" component={ExercisesView}></Tab.Screen>
+      <Tab.Navigator>
+        <Tab.Screen name="Profile">
+            {(props) => (
+              <ProfileView {...props} username={this.state.username} accessToken={this.state.accessToken} />
+            )}
+        </Tab.Screen>
+        <Tab.Screen name="Exercise">
+            {(props) => (
+              <ExercisesView {...props} username={this.state.username} accessToken={this.state.accessToken} />
+            )}
+        </Tab.Screen>
       </Tab.Navigator>
     )
   }
@@ -58,7 +80,7 @@ class App extends React.Component {
           <Stack.Screen name="Login">
             {/* This is how you pass props (e.g. setAccessToken) to another component */}
             {(props) => (
-              <LoginView {...props} setAccessToken={this.accessToken} />
+              <LoginView {...props} setAccessToken={this.setAccessToken} setUsername={this.setUsername}/>
             )}
           </Stack.Screen>
 
@@ -69,11 +91,14 @@ class App extends React.Component {
               See https://reactnavigation.org/docs/nesting-navigators on how to nest navigators.
             */}
             {(props) => (
-              <SignupView {...props} setAccessToken={this.setAccessToken} />
+              <SignupView {...props} setAccessToken={this.setAccessToken} setUsername={this.setUsername}/>
             )}
 
-          <Stack.Screen name="Profile" component={this.Home}>
+
+          <Stack.Screen name="Home" component={this.Home}>
+
           </Stack.Screen>
+
         </Stack.Navigator>
       </NavigationContainer>
 
@@ -81,5 +106,19 @@ class App extends React.Component {
     );
   }
 }
+
+/*
+          <Stack.Screen name="Home" component={(props) => <NestedView {...this.props} testProp="some test prop string" />} /> 
+
+
+          <Stack.Screen name="Home" component={Home} />
+              
+              {/* We can also nest another navigator (e.g. Bottom Tabs, Drawer, etc.) inside a stack navigator.
+                  See https://reactnavigation.org/docs/nesting-navigators on how to nest navigators.
+                
+                {(props) => (
+                  <Home {...props} username={this.state.username} token={this.state.accessToken}/>
+                )}
+*/
 
 export default App;

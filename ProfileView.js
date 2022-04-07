@@ -19,8 +19,11 @@ class ProfileView extends React.Component {
   submit() {
     const {firstName, lastName, calories, protein, carbs, fat, activity} = this.state;
     console.log('route params:')
-    console.log(this.props.route.params)
-    const { username, token } = this.props.route.params;
+ //   console.log(this.props.route.params)
+   // const { username, token } = this.props.route.params;
+   console.log(this.props)
+   let username = this.props.username;
+   let token = this.props.accessToken;
 
 
     fetch('https://cs571.cs.wisc.edu/users/' + username, {

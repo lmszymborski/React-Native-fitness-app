@@ -44,7 +44,12 @@ class LoginView extends React.Component {
       })
       .then(responseJson => {
         console.log(responseJson)
-        this.props.navigation.navigate('Profile', {screen: "Profile", props: {username: username,token: responseJson.token}})
+        console.log(this.props)
+       // this.props.setAccessToken.bind(this, responseJson.token);
+        this.props.setAccessToken(responseJson.token);
+        this.props.setUsername(username);
+        this.props.navigation.navigate('Home');
+       // this.props.navigation.navigate('Profile', {screen: "Profile", props: {username: username,token: responseJson.token}})
       })
       .catch(error => {
         if (error instanceof Error) {
