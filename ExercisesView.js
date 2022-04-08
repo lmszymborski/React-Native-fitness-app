@@ -10,7 +10,8 @@ class ExercisesView extends React.Component {
         exercise_name: "",
         duration: 0,
         num_calories: 0,
-        exercise_list: []
+        exercise_list: [],
+        edit_visible: false,
       }
 
       this.getExerciseCard = this.getExerciseCard.bind(this);
@@ -49,18 +50,19 @@ class ExercisesView extends React.Component {
     console.log(token)
 
 
-    fetch('https://cs571.cs.wisc.edu/activities', {
+    fetch('https://cs571.cs.wisc.edu/activities/', {
 
       method: "POST",
       headers: {
-        'x-access-token': token,
+        'content-type': 'application/json',
+        'x-access-token': this.props.accessToken,
       },
-      body: {
-        "name": this.state.exercise_name,
-        "duration": this.state.duration,
-        "calories": this.state.num_calories,
-        "date": "2021-11-09T03:04:57.153Z"
-      }
+      body: JSON.stringify({
+        name: this.state.exercise_name,
+        duration: this.state.duration,
+        calories: this.state.num_calories,
+        date: "2021-11-10T03:04:57.153Z",
+      })
     })
     .then(res => res.json())
     .then(res => {
@@ -125,18 +127,86 @@ class ExercisesView extends React.Component {
       return response.json();
     })
     .then(responseJson => {
-      alert("Acitvity Deleted!")
+      alert("Acitvity Deleted!");
+      this.getExercises();
+    })
+  }
+  
+  openEditActivityModal = (visible) => {
+    this.setState({edit_visible: visible})
+  }
+
+  editActivity(exercise) {
+    this.openEditActivityModal(!this.state.edit_visible);
+    console.log(this.state.exercise_name)
+    console.log(this.state.duration)
+    console.log(this.state.num_calories)
+    fetch('https://cs571.cs.wisc.edu/activities/' + exercise.id, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'x-access-token': this.props.accessToken,
+      },
+      body: JSON.stringify({
+        name: this.state.exercise_name,
+        duration: this.state.duration,
+        calories: this.state.num_calories,
+        date: "2021-11-10T03:04:57.153Z",
+      })
+    })
+    .then(responseJson => {
+      alert("Activity edited!");
       this.getExercises();
     })
   }
 
   getExerciseCard(key, exercise) {
+    const { edit_visible } = this.state;
+
     return <Card>
         <Card.Title>{exercise.name}</Card.Title>
         <Card.Divider/>
         <Text>Duration: {exercise.duration}</Text>
         <Text>Calories burned: {exercise.calories}</Text>
         <Text>Date: {exercise.date}</Text>
+        <Button title="Edit" onPress={this.openEditActivityModal.bind(this)}></Button>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={edit_visible}
+          onRequestClose={() => {
+            this.setModalVisible(!edit_visible);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.title}>Edit Activity</Text>
+              <TextInput
+                style={styles.input}
+                placeholder={exercise.name}
+                onChangeText={exercise_name => this.setState({ exercise_name })} 
+              />
+              <TextInput
+                style={styles.input}
+                placeholder={exercise.duration}
+                onChangeText={duration => this.setState({ duration })} 
+              />
+              <TextInput
+                style={styles.input}
+                placeholder={exercise.calories}
+                onChangeText={num_calories => this.setState({ num_calories })} 
+              />
+              <Button title="Change Activity" onPress={this.editActivity.bind(this, exercise)}></Button>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => this.openEditActivityModal(!edit_visible)}
+              >
+                <Text style={styles.textStyle}>Close</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
         <Button title="Delete" onPress={this.deleteActivity.bind(this, exercise)}></Button>
       </Card>
   }
