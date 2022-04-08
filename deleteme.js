@@ -1,27 +1,17 @@
+
 import React from "react";
 import { StyleSheet, Text, View, Button, Modal, Pressable, TextInput, Platform } from "react-native";
-import {Card} from 'react-native-elements'
 
 class ExercisesView extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
       this.state = {
         modalVisible: false,
         exercise_name: "",
         duration: 0,
         num_calories: 0,
-        exercise_list: []
+        exercise_list: undefined
       }
-
-      this.getExerciseCard = this.getExerciseCard.bind(this);
-      this.createExercise = this.createExercise.bind(this);
-      this.setModalVisible = this.setModalVisible.bind(this);
-      this.getExercises = this.getExercises.bind(this);
-      this.getExercises = this.getExercises.bind(this);
-      this.listExercises = this.listExercises.bind(this);
-
-
-
   }
 
   /*
@@ -42,30 +32,29 @@ class ExercisesView extends React.Component {
     let duration = this.state.duration;
     let num_calories = this.state.num_calories;
     console.log(exercise_name)
-    console.log(duration)
-    console.log(num_calories)
     
     let token = this.props.accessToken;
-    console.log(token)
 
 
-    fetch('https://cs571.cs.wisc.edu/activities', {
+    fetch('https://cs571.cs.wisc.edu/activities/', {
 
       method: "POST",
       headers: {
         'x-access-token': token,
       },
-      body: {
-        "name": this.state.exercise_name,
-        "duration": this.state.duration,
-        "calories": this.state.num_calories,
-        "date": "2021-11-09T03:04:57.153Z"
-      }
+      body: JSON.stringify({
+        name: exercise_name,
+        duration: duration,
+        calories: num_calories,
+        date: "2021-11-09T03:04:57.153Z"
+      })
     })
-    .then(res => res.json())
-    .then(res => {
+    .then(response => {
+      if (!response.ok) throw response;
+      return response.json();
+    })
+    .then(responseJson => {
       console.log('yay!')
-      console.log(res.message)
       alert("Exercise Added!")
       this.getExercises();
     })
@@ -85,12 +74,14 @@ class ExercisesView extends React.Component {
     })
     .then(response => response.json())
     .then(response => { 
-      this.setState({ exercise_list: response.activities })
+      console.log(response)
+      this.setState({ exercise_list: response })
     })
   }
 
   getExercises() {
     fetch('https://cs571.cs.wisc.edu/activities/', {
+
       method: "GET",
       headers: {
         'x-access-token': this.props.accessToken,
@@ -99,46 +90,22 @@ class ExercisesView extends React.Component {
     .then(response => response.json())
     .then(response => { 
       console.log(response)
-      this.setState({ exercise_list: response.activities})
-      console.log(this.state.exercise_list)
+      this.setState({ exercise_list: response})
     })
   }
 
   listExercises() {
     let exercises = [];
     console.log(this.state.exercise_list)
-    this.state.exercise_list.forEach((exercise, index) => {
-        exercises.push(this.getExerciseCard(index, exercise));
-      })
+
+    if (this.state.exercise_list) {
+  //    console.log(this.state.exercise_list["activities"])
+      exercises = this.state.exercise_list["activities"].map((exercise) => (
+        <Text>{exercise.name}</Text>
+
+      ))
+    }
     return exercises;
-  }
-
-  deleteActivity(exercise) {
-    fetch('https://cs571.cs.wisc.edu/activities/' + exercise.id, {
-      method: 'DELETE',
-      headers: {
-        'x-access-token': this.props.accessToken,
-      }
-    })
-    .then(response => {
-      if (!response.ok) throw response;
-      return response.json();
-    })
-    .then(responseJson => {
-      alert("Acitvity Deleted!")
-      this.getExercises();
-    })
-  }
-
-  getExerciseCard(key, exercise) {
-    return <Card>
-        <Card.Title>{exercise.name}</Card.Title>
-        <Card.Divider/>
-        <Text>Duration: {exercise.duration}</Text>
-        <Text>Calories burned: {exercise.calories}</Text>
-        <Text>Date: {exercise.date}</Text>
-        <Button title="Delete" onPress={this.deleteActivity.bind(this, exercise)}></Button>
-      </Card>
   }
 
   render() {
@@ -245,3 +212,4 @@ const styles = StyleSheet.create({
 });
 
 export default ExercisesView;
+
