@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, Modal, Pressable, TextInput, Platform } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Button, Modal, Pressable, TextInput, Platform } from "react-native";
 import {Card} from 'react-native-elements'
 
 class ExercisesView extends React.Component {
@@ -40,17 +40,6 @@ class ExercisesView extends React.Component {
   createExercise() {
     this.setState({ modalVisible: false });
 
-    let exercise_name = this.state.exercise_name;
-    let duration = this.state.duration;
-    let num_calories = this.state.num_calories;
-    console.log(exercise_name)
-    console.log(duration)
-    console.log(num_calories)
-    
-    let token = this.props.accessToken;
-    console.log(token)
-
-
     fetch('https://cs571.cs.wisc.edu/activities/', {
 
       method: "POST",
@@ -67,14 +56,13 @@ class ExercisesView extends React.Component {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('yay!')
-      console.log(res.message)
       alert("Exercise Added!")
       this.getExercises();
     })
   }
 
   setModalVisible = (visible) => {
+    console.log("set modal visibl")
     this.setState({ modalVisible: visible });
   }
 
@@ -97,6 +85,7 @@ class ExercisesView extends React.Component {
   }
 
   getExercises() {
+    console.log('getexerciss')
     fetch('https://cs571.cs.wisc.edu/activities/', {
       method: "GET",
       headers: {
@@ -105,15 +94,12 @@ class ExercisesView extends React.Component {
     })
     .then(response => response.json())
     .then(response => { 
-      console.log(response)
       this.setState({ exercise_list: response.activities})
-      console.log(this.state.exercise_list)
     })
   }
 
   listExercises() {
     let exercises = [];
-    console.log(this.state.exercise_list)
     this.state.exercise_list.forEach((exercise, index) => {
         exercises.push(this.getExerciseCard(index, exercise));
       })
@@ -143,11 +129,7 @@ class ExercisesView extends React.Component {
   }
 
   editActivity(exercise) {
-    console.log(exercise)
     this.openEditActivityModal(!this.state.edit_visible);
-    console.log(this.state.exercise_name)
-    console.log(this.state.duration)
-    console.log(this.state.num_calories)
     if (this.state.exercise_name == "")
       this.setState({exercise_name: exercise.name})
     if (this.state.duration == 0)
@@ -177,28 +159,28 @@ class ExercisesView extends React.Component {
   getExerciseCard(key, exercise) {
     let edit_visible = false;
     let date = new Date(exercise.date)
-    console.log(exercise)
     const exercise_name = exercise.name;
     const exercise_duration = exercise.duration;
     const exercise_calories = exercise.calories;
     if (this.state.opened == true && this.state.key_opened == key) {
       edit_visible = true;
     }
-
+    console.log('edit visible ' + edit_visible)
+    console.log('key ' + this.state.key_opened)
 
     return <Card>
         <Card.Title>{exercise_name}</Card.Title>
         <Card.Divider/>
         <Text>Duration: {exercise_duration}</Text>
         <Text>Calories burned: {exercise_calories}</Text>
-        <Text>Date: {date.toLocaleString('en-US', { timeZone: 'CST' })}</Text>
+        <Text>Date: {date.toLocaleString('en-US', { timeZone: 'HST' })}</Text>
         <Button title="Edit" onPress={this.openEditActivityModal.bind(this, key, true)}></Button>
       <Modal
       animationType="slide"
       transparent={true}
       visible={edit_visible}
       onRequestClose={() => {
-        this.setEditModalVisible(!edit_visible);
+        this.openEditActivityModal(key,false);
       }}
       >
       <View style={styles.centeredView}>
@@ -240,8 +222,8 @@ class ExercisesView extends React.Component {
     const { modalVisible } = this.state;
 
     return (
-      <View style={styles.centeredView}>
-        <Button title="Create exercise" onPress={this.setModalVisible.bind(this)}></Button>
+      <ScrollView style={styles.centeredView}>
+        <Button title="Create exercise" onPress={this.setModalVisible.bind(this, true)}></Button>
         <Modal
           animationType="slide"
           transparent={true}
@@ -280,32 +262,31 @@ class ExercisesView extends React.Component {
         </Modal>
         <View>{this.listExercises()}</View>
 
-      </View>
+      </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
   title: {
-    /*
     textAlign: "center",
-    marginVertical: 10,*/
+    marginVertical: 10,
   },
   input: {
-    /*
     borderWidth: 1,
     padding: 8,
     height: 40,
-    marginVertical: 10,*/
+    marginVertical: 10,
   },
-  centeredView: {/*
+  centeredView: {
+    /*
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22*/
+    marginTop: 22,*/
+    marginHorizontal: 20,
   },
   modalView: {
-    /*
     margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
@@ -318,32 +299,27 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5*/
+    elevation: 5
   },
   button: {
-    /*
     borderRadius: 20,
     padding: 10,
-    elevation: 2*/
+    elevation: 2
   },
   buttonOpen: {
-    /*
-    backgroundColor: "#F194FF",*/
+    backgroundColor: "#F194FF",
   },
   buttonClose: {
-    /*
-    backgroundColor: "#2196F3",*/
+    backgroundColor: "#2196F3",
   },
   textStyle: {
-    /*
     color: "white",
     fontWeight: "bold",
-    textAlign: "center"*/
+    textAlign: "center"
   },
   modalText: {
-    /*
     marginBottom: 15,
-    textAlign: "center"*/
+    textAlign: "center"
   }
 });
 

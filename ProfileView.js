@@ -44,6 +44,7 @@ class ProfileView extends React.Component {
         goalDailyActivity: activity
       })
     })
+    /*
     .then(response => {
       if (!response.ok) throw response;
       return response.json();
@@ -51,7 +52,16 @@ class ProfileView extends React.Component {
     .then(responseJson => {
       console.log('yay!')
       alert("Profile saved!")
+    })*/
+    .then(function(response){
+      alert("Profile saved!")
+      return response.json();
     })
+    .catch(function(error) {
+    console.log('There has been a problem with your fetch operation: ' + error.message);
+     // ADD THIS THROW error
+      throw error;
+    });
   }
 
   render() {
@@ -99,11 +109,6 @@ class ProfileView extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    position: 'fixed',
-    height: 60,
-    width: '100%'
-  },
   container: {
     flex: 1,
     justifyContent: "center",

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, Modal, Pressable, TextInput, Platform } from "react-native";
+import { ScrollView, StyleSheet, Text, View, Button, Modal, Pressable, TextInput, Platform } from "react-native";
 import {Card} from 'react-native-elements'
 
 class ExercisesView extends React.Component {
@@ -11,7 +11,8 @@ class ExercisesView extends React.Component {
         duration: 0,
         num_calories: 0,
         exercise_list: [],
-        edit_visible: false,
+        opened: false,
+        key_opened: 0
       }
 
       this.getExerciseCard = this.getExerciseCard.bind(this);
@@ -39,17 +40,6 @@ class ExercisesView extends React.Component {
   createExercise() {
     this.setState({ modalVisible: false });
 
-    let exercise_name = this.state.exercise_name;
-    let duration = this.state.duration;
-    let num_calories = this.state.num_calories;
-    console.log(exercise_name)
-    console.log(duration)
-    console.log(num_calories)
-    
-    let token = this.props.accessToken;
-    console.log(token)
-
-
     fetch('https://cs571.cs.wisc.edu/activities/', {
 
       method: "POST",
@@ -61,20 +51,23 @@ class ExercisesView extends React.Component {
         name: this.state.exercise_name,
         duration: this.state.duration,
         calories: this.state.num_calories,
-        date: "2021-11-10T03:04:57.153Z",
+        date: new Date(),
       })
     })
     .then(res => res.json())
     .then(res => {
-      console.log('yay!')
-      console.log(res.message)
       alert("Exercise Added!")
       this.getExercises();
     })
   }
 
   setModalVisible = (visible) => {
+    console.log("set modal visibl")
     this.setState({ modalVisible: visible });
+  }
+
+  setEditModalVisible = (visible) => {
+    this.setState({ edit_visible: visible })
   }
 
   componentDidMount() {
@@ -92,6 +85,7 @@ class ExercisesView extends React.Component {
   }
 
   getExercises() {
+    console.log('getexerciss')
     fetch('https://cs571.cs.wisc.edu/activities/', {
       method: "GET",
       headers: {
@@ -100,15 +94,12 @@ class ExercisesView extends React.Component {
     })
     .then(response => response.json())
     .then(response => { 
-      console.log(response)
       this.setState({ exercise_list: response.activities})
-      console.log(this.state.exercise_list)
     })
   }
 
   listExercises() {
     let exercises = [];
-    console.log(this.state.exercise_list)
     this.state.exercise_list.forEach((exercise, index) => {
         exercises.push(this.getExerciseCard(index, exercise));
       })
@@ -132,15 +123,19 @@ class ExercisesView extends React.Component {
     })
   }
   
-  openEditActivityModal = (visible) => {
-    this.setState({edit_visible: visible})
+  openEditActivityModal(key, opened) {
+    this.setState({key_opened: key})
+    this.setState({opened: opened})
   }
 
   editActivity(exercise) {
     this.openEditActivityModal(!this.state.edit_visible);
-    console.log(this.state.exercise_name)
-    console.log(this.state.duration)
-    console.log(this.state.num_calories)
+    if (this.state.exercise_name == "")
+      this.setState({exercise_name: exercise.name})
+    if (this.state.duration == 0)
+      this.setState({duration: exercise.duration})
+    if (this.state.num_calories == 0)
+      this.setState({num_calories: exercise.calories})
     fetch('https://cs571.cs.wisc.edu/activities/' + exercise.id, {
       method: 'PUT',
       headers: {
@@ -152,7 +147,7 @@ class ExercisesView extends React.Component {
         name: this.state.exercise_name,
         duration: this.state.duration,
         calories: this.state.num_calories,
-        date: "2021-11-10T03:04:57.153Z",
+        date: new Date(),
       })
     })
     .then(responseJson => {
@@ -162,51 +157,59 @@ class ExercisesView extends React.Component {
   }
 
   getExerciseCard(key, exercise) {
-    const { edit_visible } = this.state;
+    let edit_visible = false;
+    let date = new Date(exercise.date)
+    const exercise_name = exercise.name;
+    const exercise_duration = exercise.duration;
+    console.log('ex dur: ' + exercise.duration)
+    const exercise_calories = exercise.calories;
+    if (this.state.opened == true && this.state.key_opened == key) {
+      edit_visible = true;
+    }
+    console.log('edit visible ' + edit_visible)
+    console.log('key ' + this.state.key_opened)
 
     return <Card>
-        <Card.Title>{exercise.name}</Card.Title>
+        <Card.Title>{exercise_name}</Card.Title>
         <Card.Divider/>
-        <Text>Duration: {exercise.duration}</Text>
-        <Text>Calories burned: {exercise.calories}</Text>
-        <Text>Date: {exercise.date}</Text>
-        <Button title="Edit" onPress={this.openEditActivityModal.bind(this)}></Button>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={edit_visible}
-          onRequestClose={() => {
-            this.setModalVisible(!edit_visible);
-          }}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.title}>Edit Activity</Text>
-              <TextInput
-                style={styles.input}
-                placeholder={exercise.name}
-                onChangeText={exercise_name => this.setState({ exercise_name })} 
-              />
-              <TextInput
-                style={styles.input}
-                placeholder={exercise.duration}
-                onChangeText={duration => this.setState({ duration })} 
-              />
-              <TextInput
-                style={styles.input}
-                placeholder={exercise.calories}
-                onChangeText={num_calories => this.setState({ num_calories })} 
-              />
-              <Button title="Change Activity" onPress={this.editActivity.bind(this, exercise)}></Button>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => this.openEditActivityModal(!edit_visible)}
-              >
-                <Text style={styles.textStyle}>Close</Text>
-              </Pressable>
-            </View>
+        <Text>Duration: {exercise_duration}</Text>
+        <Text>Calories burned: {exercise_calories}</Text>
+        <Text>Date: {date.toLocaleString('en-US', { timeZone: 'HST' })}</Text>
+        <Button title="Edit" onPress={this.openEditActivityModal.bind(this, key, true)}></Button>
+      <Modal
+            transparent={true}
+            visible={edit_visible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.title}>Edit Activity</Text>
+            <Text>Name</Text>
+            <TextInput
+              style={styles.input}
+              placeholder={exercise.name}
+              onChangeText={exercise_name => this.setState({ exercise_name })} 
+            />
+            <Text>Duration</Text>
+            <TextInput
+              style={styles.input}
+              placeholder={String(exercise.duration)}
+              onChangeText={duration => this.setState({ duration })} 
+            />
+            <Text>Calories</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={String(exercise.calories)}
+            onChangeText={num_calories => this.setState({ num_calories })} 
+          />
+            <Button title="Change Activity" onPress={this.editActivity.bind(this, exercise)}></Button>
+            <Button
+            style={[styles.button, styles.buttonClose]}
+            onPress={this.openEditActivityModal.bind(this, key, false)}
+            title="Close"
+          ></Button>
           </View>
-        </Modal>
+        </View>
+    </Modal>
         <Button title="Delete" onPress={this.deleteActivity.bind(this, exercise)}></Button>
       </Card>
   }
@@ -215,8 +218,8 @@ class ExercisesView extends React.Component {
     const { modalVisible } = this.state;
 
     return (
-      <View style={styles.centeredView}>
-        <Button title="Create exercise" onPress={this.setModalVisible.bind(this)}></Button>
+      <ScrollView style={styles.centeredView}>
+        <Button title="Create exercise" onPress={this.setModalVisible.bind(this, true)}></Button>
         <Modal
           animationType="slide"
           transparent={true}
@@ -255,7 +258,7 @@ class ExercisesView extends React.Component {
         </Modal>
         <View>{this.listExercises()}</View>
 
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -272,10 +275,12 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   centeredView: {
+    /*
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22
+    marginTop: 22,*/
+    marginHorizontal: 20,
   },
   modalView: {
     margin: 20,
