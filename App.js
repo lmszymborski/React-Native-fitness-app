@@ -47,7 +47,7 @@ class App extends React.Component {
   }
 
   logout() {
-    
+
   }
 
   /*
@@ -105,12 +105,7 @@ class App extends React.Component {
             name="Home" 
             component={this.Home}
             options={{
-              headerRight: () => (
-              <Button 
-                onPress={this.logout.bind(this)}
-                title="Log out"
-              />
-              )
+              headerBackTitle: 'Log out',
             }}>
 
           </Stack.Screen>
