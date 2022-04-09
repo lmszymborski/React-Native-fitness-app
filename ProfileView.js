@@ -16,8 +16,52 @@ class ProfileView extends React.Component {
     }
   }
 
+  getProfile() {
+    fetch('https://cs571.cs.wisc.edu/users/' + this.props.username, {
+      method: "GET",
+      headers: {
+        'x-access-token': this.props.accessToken,
+      }
+    })
+    .then(response => response.json())
+    .then(response => { 
+      console.log(response)
+     // this.setState({ exercise_list: response.activities})
+    })
+    .catch(function(error) {
+      console.log('There has been a problem with your fetch operation: ' + error.message);
+       // ADD THIS THROW error
+        throw error;
+      });
+  }
+
+  componentDidMount() {
+    fetch('https://cs571.cs.wisc.edu/users/' + this.props.username, {
+      method: "GET",
+      headers: {
+        'x-access-token': this.props.accessToken,
+      }
+    })
+    .then(response => response.json())
+    .then(response => { 
+      console.log(response)
+      this.setState({ firstName: response.firstName})
+      this.setState({ activity: response.goalDailyActivity})
+      this.setState({ carbs: response.goalDailyCarbohydrates})
+      this.setState({ fat: response.goalDailyFat})
+      this.setState({ protein: response.goalDailyProtein})
+      this.setState({ lastName: response.lastName})
+    })
+    .catch(function(error) {
+      console.log('There has been a problem with your fetch operation: ' + error.message);
+       // ADD THIS THROW error
+        throw error;
+      });
+  }
+
   submit() {
     const {firstName, lastName, calories, protein, carbs, fat, activity} = this.state;
+    console.log(lastName)
     console.log('route params:')
  //   console.log(this.props.route.params)
    // const { username, token } = this.props.route.params;
@@ -54,6 +98,7 @@ class ProfileView extends React.Component {
       alert("Profile saved!")
     })*/
     .then(function(response){
+      this.getProfile();
       alert("Profile saved!")
       return response.json();
     })
@@ -68,6 +113,14 @@ class ProfileView extends React.Component {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Personal Information</Text>
+        <Text>First Name: {this.state.firstName}</Text>
+        <Text>Last Name: {this.state.lastName}</Text>
+        <Text>Daily Calories: {this.state.calories}</Text>
+        <Text>Daily Protein: {this.state.protein}</Text>
+        <Text>Daily Carbohydrates: {this.state.carbs}</Text>
+        <Text>Daily Fat: {this.state.fat}</Text>
+        <Text>Daily Activity: {this.state.activity}</Text>
+
         <TextInput 
           style={styles.input} 
           placeholder="First Name"

@@ -84,7 +84,7 @@ class SignupView extends React.Component {
         {/* To navigate to another component, use this.props.navigation.navigate().
             See https://reactnavigation.org/docs/navigating for more details.
           */}
-        <Button title="Button" onPress={this.login.bind(this)} />
+        <Button title="Sign up!" onPress={this.login.bind(this)} />
       </View>
     );
   }
