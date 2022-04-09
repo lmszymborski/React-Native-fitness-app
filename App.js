@@ -10,7 +10,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import {View} from "react-native";
+import {Button} from "react-native";
 
 // Review the navigators from React Native 2 lecture.
 const Stack = createStackNavigator(); // Stack Navigator (https://reactnavigation.org/docs/stack-navigator)
@@ -46,6 +46,10 @@ class App extends React.Component {
     console.log(this.state.username)
   }
 
+  logout() {
+    
+  }
+
   /*
             <Stack.Screen name="Profile">
             {(props) => <ProfileView {...props} />}
@@ -54,7 +58,9 @@ class App extends React.Component {
   Home = () => {
     return (
       <Tab.Navigator>
-        <Tab.Screen name="Profile">
+        <Tab.Screen 
+          name="Profile"
+        >
             {(props) => (
               <ProfileView {...props} username={this.state.username} accessToken={this.state.accessToken} />
             )}
@@ -95,7 +101,17 @@ class App extends React.Component {
             )}
 
 
-          <Stack.Screen name="Home" component={this.Home}>
+          <Stack.Screen 
+            name="Home" 
+            component={this.Home}
+            options={{
+              headerRight: () => (
+              <Button 
+                onPress={this.logout.bind(this)}
+                title="Log out"
+              />
+              )
+            }}>
 
           </Stack.Screen>
 

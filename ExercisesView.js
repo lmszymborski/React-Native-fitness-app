@@ -7,7 +7,7 @@ class ExercisesView extends React.Component {
     super(props);
       this.state = {
         modalVisible: false,
-        exercise_name: "",
+        exercise_name: "New Activity",
         duration: 0,
         num_calories: 0,
         exercise_list: [],
@@ -177,6 +177,7 @@ class ExercisesView extends React.Component {
         <Text>Date: {date.toLocaleString('en-US', { timeZone: 'HST' })}</Text>
         <Button title="Edit" onPress={this.openEditActivityModal.bind(this, key, true)}></Button>
       <Modal
+            animationType="slide"
             transparent={true}
             visible={edit_visible}
       >
@@ -187,18 +188,21 @@ class ExercisesView extends React.Component {
             <TextInput
               style={styles.input}
               placeholder={exercise.name}
+              placeholderTextColor="gray"
               onChangeText={exercise_name => this.setState({ exercise_name })} 
             />
             <Text>Duration</Text>
             <TextInput
               style={styles.input}
               placeholder={String(exercise.duration)}
+              placeholderTextColor="gray"
               onChangeText={duration => this.setState({ duration })} 
             />
             <Text>Calories</Text>
           <TextInput
             style={styles.input}
             placeholder={String(exercise.calories)}
+            placeholderTextColor="gray"
             onChangeText={num_calories => this.setState({ num_calories })} 
           />
             <Button title="Change Activity" onPress={this.editActivity.bind(this, exercise)}></Button>
@@ -231,28 +235,34 @@ class ExercisesView extends React.Component {
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text style={styles.title}>Create New Exercise</Text>
+              <Text>Exercise Name</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Exercise name"
+                placeholderTextColor="gray"
                 onChangeText={exercise_name => this.setState({ exercise_name })} 
               />
+              <Text>Duration</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Duration"
+                placeholderTextColor="gray"
                 onChangeText={duration => this.setState({ duration })} 
               />
+              <Text>Calories Burned</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Number of Calories"
+                placeholderTextColor="gray"
                 onChangeText={num_calories => this.setState({ num_calories })} 
               />
               <Button title="Add" onPress={this.createExercise.bind(this)}></Button>
-              <Pressable
+              <Button
+                title="Hide"
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => this.setModalVisible(!modalVisible)}
               >
-                <Text style={styles.textStyle}>Hide Modal</Text>
-              </Pressable>
+              </Button>
             </View>
           </View>
         </Modal>
@@ -275,8 +285,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   centeredView: {
-    /*
     flex: 1,
+    /*
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,*/
