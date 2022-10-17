@@ -2,4 +2,5 @@ This application is a fitness app where you can track calories, food intake, log
 
 To run:
 npm install
-npm start
+
+Run using the Expo app
