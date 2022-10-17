@@ -4,3 +4,5 @@ To run:
 npm install
 
 Run using the Expo app
+
+Video demo [here](https://vimeo.com/760923572)
